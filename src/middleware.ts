@@ -1,5 +1,5 @@
+import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -10,11 +10,9 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const sessionCookie = getSessionCookie(request);
 
-    if (!session || !session.user) {
+    if (!sessionCookie) {
       const signInUrl = new URL("/sign-in", request.url);
       signInUrl.searchParams.set("redirect_to", pathname);
       return NextResponse.redirect(signInUrl);
